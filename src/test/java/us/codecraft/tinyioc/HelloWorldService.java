@@ -1,9 +1,14 @@
 package us.codecraft.tinyioc;
 
 /**
- * @author yihua.huang@dianping.com
+ * service
+ *
+ * @author Sky
+ * @Date 2021-03-23 17:08.
  */
-public interface HelloWorldService {
+public class HelloWorldService {
 
-    void helloWorld();
+    public void hello() {
+        System.out.println("Hello world!");
+    }
 }
