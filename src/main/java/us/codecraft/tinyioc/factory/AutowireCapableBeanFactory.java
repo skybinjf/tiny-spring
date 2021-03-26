@@ -1,11 +1,12 @@
 package us.codecraft.tinyioc.factory;
 
 import us.codecraft.tinyioc.BeanDefinition;
+import us.codecraft.tinyioc.PropertyValue;
+
+import java.lang.reflect.Field;
 
 /**
- * step1中的bean是初始化好之后再set进去的，实际使用中，我们希望容器来管理bean的创建。于是我们将bean的初始化放入BeanFactory中。
- * 为了保证扩展性，我们使用Extract Interface的方法，将BeanFactory替换成接口，而使用AbstractBeanFactory和AutowireCapableBeanFactory作为其实现。
- * "AutowireCapable"的意思是“可自动装配的”，为我们后面注入属性做准备。
+ * 可自动装配内容的BeanFactory
  *
  * @author Sky
  * @Date 2021-03-25 14:05.
@@ -13,15 +14,21 @@ import us.codecraft.tinyioc.BeanDefinition;
 public class AutowireCapableBeanFactory extends AbstractBeanFactory{
 
     @Override
-    protected Object doCreateBean(BeanDefinition beanDefinition) {
-        try {
-            Object bean = beanDefinition.getBeanClass().newInstance();
-            return bean;
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+    protected Object doCreateBean(BeanDefinition beanDefinition) throws Exception {
+        Object bean = createBeanInstance(beanDefinition);
+        applyPropertyValue(bean, beanDefinition);
+        return bean;
+    }
+
+    protected void applyPropertyValue(Object bean, BeanDefinition beanDefinition) throws Exception {
+        for (PropertyValue propertyValue : beanDefinition.getPropertyValues().getPropertyValueList()) {
+            Field declaredField = bean.getClass().getDeclaredField(propertyValue.getName());
+            declaredField.setAccessible(true);
+            declaredField.set(bean, propertyValue.getValue());
         }
-        return null;
+    }
+
+    protected Object createBeanInstance(BeanDefinition beanDefinition) throws Exception {
+        return beanDefinition.getBeanClass().newInstance();
     }
 }

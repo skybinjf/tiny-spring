@@ -8,7 +8,13 @@ package us.codecraft.tinyioc;
  */
 public class HelloWorldService {
 
-    public void hello() {
-        System.out.println("Hello world!");
+    private String text;
+
+    public void helloWorld() {
+        System.out.println(text);
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 }
